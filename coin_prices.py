@@ -42,7 +42,7 @@ try:
                  usd_prices = []
 
              if i == 'btc' and args.usd:
-                 print (i,":\t","{:.4f}".format(float(data[i])),"USD")
+                 print (i,"\t","{:.4f}".format(float(data[i])),"USD")
              elif i == 'btc':
                  pass
              else:
