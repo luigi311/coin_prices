@@ -5,10 +5,10 @@ def check_prices(names):
     with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
         data = json.loads(url.read().decode())
         allPrices = data["result"]
- 
+
     exchange_names = ["BTC-"+x.upper() for x in names]
     coins_dict = dict.fromkeys(names)
- 
+
     for i in allPrices:
         for c in exchange_names:
             indexOfName = exchange_names.index(c)
@@ -27,9 +27,11 @@ try:
         print (strftime("%m-%d-%y %H:%M:%S", gmtime()))
         for i in names:
              if i == 'btc':
-                 print (i+":\t",data[i],"USD")
+                 print (i,":\t",data[i],"USD")
              else:
-                 print (i+":\t",data[i],"BTC")
+                 print (i,":\t",
+                   "{0:.3f}".format(float(data[i])*float(data['btc'])),'USD',
+                   "\t", data[i],"BTC")
 
         time.sleep(3)
 
