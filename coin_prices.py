@@ -49,7 +49,7 @@ try:
                  print (i,"\t", *usd_prices, *btc_prices)
 
 
-        time.sleep(10)
+        time.sleep(60)
 
 except KeyboardInterrupt:
     print('\nExiting')
