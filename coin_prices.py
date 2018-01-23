@@ -33,7 +33,7 @@ try:
                    "{0:.3f}".format(float(data[i])*float(data['btc'])),'USD',
                    "\t", data[i],"BTC")
 
-        time.sleep(3)
+        time.sleep(10)
 
 except KeyboardInterrupt:
     print('\nExiting')
