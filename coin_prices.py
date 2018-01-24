@@ -48,14 +48,18 @@ def print_output(coin_names,data):
     for i in coin_names:
         if args.source == "coinmarketcap":
             usd_prices = [data[i],'USD']
-            btc_prices = ["{:.8f}".format(data[i]/data["btc"]),"BTC"]
+            if i == "btc":
+                btc_prices = []
+            else:
+                btc_prices = ["{:.8f}".format(data[i]/data["btc"]),"BTC"]
 
         else:
             if i == "btc":
                 usd_prices = [data[i],"USD"]
+                btc_prices = []
             else:
                 usd_prices = ["{:.4f}".format(data[i]*data['btc']),'USD']
-            btc_prices = [data[i],"BTC"]
+                btc_prices = [data[i],"BTC"]
 
         if args.usd and args.btc == 0:
             btc_prices = []
