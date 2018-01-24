@@ -7,13 +7,15 @@ parser.add_argument("--btc", help="Display Bitcoin prices", action="store_true")
 parser.add_argument("--usd", help="Display USD prices", action="store_true")
 args = parser.parse_args()
 
-def check_prices(names):
-    with urllib.request.urlopen("https://bittrex.com/api/v1.1/public/getmarketsummaries") as url:
+bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
+
+def bittrex(coin_names):
+    with urllib.request.urlopen(bittrex_api) as url:
         data = json.loads(url.read().decode())
         allPrices = data["result"]
 
-    exchange_names = ["BTC-"+x.upper() for x in names]
-    coins_dict = dict.fromkeys(names)
+    exchange_names = ["BTC-"+x.upper() for x in coin_names]
+    coins_dict = dict.fromkeys(coin_names)
 
     for i in allPrices:
         for c in exchange_names:
@@ -21,18 +23,18 @@ def check_prices(names):
             if (i["MarketName"] == 'USDT-BTC'):
                 coins_dict['btc'] = "{:.8f}".format(i["Last"])
             if (i["MarketName"] == c):
-                coins_dict[names[indexOfName]] = "{:.8f}".format(i["Last"])
+                coins_dict[coin_names[indexOfName]] = "{:.8f}".format(i["Last"])
 
     return coins_dict
 
 try:
     while True:
-        names = ["btc","strat","xvg","snt","gnt","pay","steem","neo"]
-        data = check_prices(names)
+        coin_names = ["btc","strat","xvg","snt","gnt","pay","steem","neo"]
+        data = bittrex(coin_names)
         os.system('clear')
 
         print (strftime("%m-%d-%y %H:%M:%S", gmtime()))
-        for i in names:
+        for i in coin_names:
              usd_prices = ["{:.4f}".format(float(data[i])*float(data['btc'])),'USD']
              btc_prices = [data[i],"BTC"]
 
@@ -47,7 +49,6 @@ try:
                  pass
              else:
                  print (i,"\t", *usd_prices, *btc_prices)
-
 
         time.sleep(60)
 
