@@ -9,6 +9,7 @@ parser.add_argument("--btc", help="Display Bitcoin prices", action="store_true")
 parser.add_argument("--usd", help="Display USD prices", action="store_true")
 args = parser.parse_args()
 
+coin_file = './coin_list.txt'
 coinmarketcap_api = "https://api.coinmarketcap.com/v1/ticker/"
 bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
 
@@ -70,7 +71,8 @@ def print_output(coin_names,data):
 
 try:
     while True:
-        coin_names = ["btc","strat","xvg","snt","gnt","pay","steem","neo"]
+        #coin_names = ["btc","strat","xvg","snt","gnt","pay","steem","neo"]
+        coin_names = open(coin_file,'r').read().splitlines()
         function_map = {"coinmarketcap":coinmarketcap,"bittrex":bittrex}
 
         coin_source = function_map[args.source]
