@@ -12,10 +12,9 @@ args = parser.parse_args()
 coin_file = './coin_list.txt'
 coinmarketcap_api = "https://api.coinmarketcap.com/v1/ticker/"
 bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
+poloniex_api = "https://poloniex.com/public?command=returnTicker"
 
-def coinmarketcap(coin_names):
-    coins_dict = dict.fromkeys(coin_names)
-
+def coinmarketcap(coin_names,coins_dict):
     with urllib.request.urlopen(coinmarketcap_api) as url:
         allPrices = json.loads(url.read().decode())
 
@@ -27,21 +26,36 @@ def coinmarketcap(coin_names):
 
     return coins_dict
 
-def bittrex(coin_names):
+def bittrex(coin_names,coins_dict):
     with urllib.request.urlopen(bittrex_api) as url:
         data = json.loads(url.read().decode())
         allPrices = data["result"]
 
     exchange_names = ["BTC-"+x.upper() for x in coin_names]
-    coins_dict = dict.fromkeys(coin_names)
 
     for i in allPrices:
         for c in exchange_names:
             indexOfName = exchange_names.index(c)
             if (i["MarketName"] == 'USDT-BTC'):
-                coins_dict['btc'] = float("{:.8f}".format(i["Last"]))
+                coins_dict['btc'] = float(i["Last"])
             if (i["MarketName"] == c):
-                coins_dict[coin_names[indexOfName]] = float("{:.8f}".format(i["Last"]))
+                coins_dict[coin_names[indexOfName]] = float(i["Last"])
+
+    return coins_dict
+
+def poloniex(coin_names,coins_dict):
+    with urllib.request.urlopen(poloniex_api) as url:
+        allPrices = json.loads(url.read().decode())
+
+    exchange_names = ["BTC_"+x.upper() for x in coin_names]
+
+    for i in allPrices:
+        for c in exchange_names:
+            indexOfName = exchange_names.index(c)
+            if (i == 'USDT_BTC'):
+                coins_dict['btc'] = float(allPrices[i]["highestBid"])
+            if (i == c):
+                coins_dict[coin_names[indexOfName]] = float(allPrices[i]["highestBid"])
 
     return coins_dict
 
@@ -52,7 +66,7 @@ def print_output(coin_names,data):
             if i == "btc":
                 btc_prices = []
             else:
-                btc_prices = ["{:.8f}".format(data[i]/data["btc"]),"BTC"]
+                btc_prices = ["{:.8f}".format(data[i]/data["btc"],'f'),"BTC"]
 
         else:
             if i == "btc":
@@ -60,7 +74,7 @@ def print_output(coin_names,data):
                 btc_prices = []
             else:
                 usd_prices = ["{:.4f}".format(data[i]*data['btc']),'USD']
-                btc_prices = [data[i],"BTC"]
+                btc_prices = [format(data[i],'f'),"BTC"]
 
         if args.usd and args.btc == 0:
             btc_prices = []
@@ -71,12 +85,12 @@ def print_output(coin_names,data):
 
 try:
     while True:
-        #coin_names = ["btc","strat","xvg","snt","gnt","pay","steem","neo"]
         coin_names = open(coin_file,'r').read().splitlines()
-        function_map = {"coinmarketcap":coinmarketcap,"bittrex":bittrex}
+        function_map = {"coinmarketcap":coinmarketcap,"bittrex":bittrex,"poloniex":poloniex}
 
         coin_source = function_map[args.source]
-        data = coin_source(coin_names)
+        coins_dict = dict.fromkeys(coin_names,0)
+        data = coin_source(coin_names,coins_dict)
 
         os.system('clear')
         print (strftime("%m-%d-%y %H:%M:%S", gmtime()))
