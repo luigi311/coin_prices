@@ -1,6 +1,8 @@
 import argparse
 import urllib.request, json, time, os
 from time import gmtime, strftime
+from collections import OrderedDict
+
 
 parser = argparse.ArgumentParser(
     description="Grab the latest coin prices from any of the given sources")
@@ -136,10 +138,11 @@ try:
         # Create the coin dictionary from the coin_list file that will contain
         # the current price values intialize the dictionary here so its creation
         # doesnt have to exist on all the sources
-        coins_dict = dict.fromkeys(coin_names,0)
+        coins_dict = OrderedDict.fromkeys(coin_names,0)
         # Add the base value to the dictionary incase it isnt included in the
         # coin_file
         coins_dict[base] = 0
+        coins_dict.move_to_end(base,last=False)
 
         # Create a map that will contain all the source function names so they
         # can be called when referenced by the source argument
