@@ -96,7 +96,7 @@ def print_output(data):
             else:
                 # Create base price for coins by dividing their usd price by
                 # the current value of base
-                base_prices = ["{:.8f}".format(data[i]/data[base.upper()],'f'),
+                base_prices = ["{:.10f}".format(data[i]/data[base.upper()],'f'),
                                base.upper()]
 
         # If the source is any source besides coinmarketcap it will handle the
