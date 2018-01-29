@@ -19,11 +19,12 @@ args = parser.parse_args()
 
 # Location to where the coin list file exists
 coin_file = './coin_list.txt'
-# Default base value
-base = "BTC"
+
+# If arguemnt for base is not specified set base to bitcoin
 if args.base:
     base = args.base.upper()
-
+else:
+    base = "BTC"
 # Api list for the sources
 coinmarketcap_api = "https://api.coinmarketcap.com/v1/ticker/"
 bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
@@ -49,6 +50,7 @@ def bittrex(coins_dict):
     # Grab the response from bittrex api which is a dictionary
     with urllib.request.urlopen(bittrex_api) as url:
         data = json.loads(url.read().decode())
+
         # Grab only the result key from the dictionary as that contains all the
         # information
         allPrices = data["result"]
@@ -59,6 +61,7 @@ def bittrex(coins_dict):
             # base in USD
             if (i["MarketName"] == 'USDT-'+base.upper()):
                 coins_dict[base.upper()] = float(i["Ask"])
+
             # Grab the price for all the other coins in their base value based
             # on the Ask trade value which is the lowest people want to sell
             if (i["MarketName"] == base.upper()+"-"+c):
@@ -78,8 +81,10 @@ def poloniex(coins_dict):
             # base in USD
             if (i == 'USDT_'+base.upper()):
                 coins_dict[base.upper()] = float(allPrices[i]["lowestAsk"])
-            # Grab the price for all the other coins in their base value based on
-            # the current lowestAsk which is the lowest price people are selling
+
+            # Grab the price for all the other coins in their base value based
+            # on the current lowestAsk which is the lowest price people are
+            # selling
             if (i == base.upper()+"_"+c):
                 coins_dict[c] = float(allPrices[i]["lowestAsk"])
 
@@ -87,11 +92,18 @@ def poloniex(coins_dict):
 
 # Function that will handle all the printing to the terminal
 def print_output(data):
+    # Clear the terminal so it can print only the information
+    os.system('clear')
+
+    # Print the time so you can tell when the prices were last updated
+    print (strftime("%m-%d-%y %H:%M:%S", gmtime()))
+
     for i in data:
         # Coinmarketcap printing must be handled differently due to all the
         # prices being in USD instead of base like all the exchanges
         if args.source == "coinmarketcap":
             usd_prices = [data[i],'USD']
+
             # Do not create the base price for base
             if i == base.upper():
                 base_prices = []
@@ -120,6 +132,7 @@ def print_output(data):
         # then it will clear the base values thus only printing the USD prices
         if args.usd and args.btc == 0:
             base_prices = []
+
         # If the argument for printing base is used but not the argument for USD
         # then it will clear the USD values thus only prining the base prices
         if args.btc and args.usd == 0:
@@ -139,6 +152,7 @@ try:
         # the current price values intialize the dictionary here so its creation
         # doesnt have to exist on all the sources
         coins_dict = OrderedDict.fromkeys(coin_names,0)
+
         # Add the base value to the dictionary incase it isnt included in the
         # coin_file
         coins_dict[base] = 0
@@ -153,14 +167,11 @@ try:
         # Utilize the function_map to create the connection between the source
         # argument and the function can be called with just the variable
         coin_source = function_map[args.source]
+
         # Grab the current prices for the coins that were specified and put them
         # into the coins_dict dictionary
         coins_dict = coin_source(coins_dict)
 
-        # Clear the terminal so it can print only the information
-        os.system('clear')
-        # Print the time so you can tell when the prices were last updated
-        print (strftime("%m-%d-%y %H:%M:%S", gmtime()))
         # Call the printing function that will decide which print scheme to use
         # based on the source
         print_output(coins_dict)
