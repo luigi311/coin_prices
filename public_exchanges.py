@@ -1,11 +1,13 @@
-import urllib.request, json
+import urllib.request, json, gzip, time
+from websocket import create_connection
+
 
 # Api list for the sources
 coinmarketcap_api = "https://api.coinmarketcap.com/v1/ticker/"
 bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
 poloniex_api = "https://poloniex.com/public?command=returnTicker"
 bithumb_api = "https://api.bithumb.com/public/ticker/all"
-
+huobipro_api = "wss://api.huobipro.com/ws"
 # Function to grab the information from Coinmarketcap
 def coinmarketcap(coins_dict,base):
     # Grab all the prices from coinmarketcap and puts it in a list
@@ -82,5 +84,29 @@ def bithumb(coins_dict,base):
             # sell_price as that is the lowest price someone is selling for
             if (i == c):
                 coins_dict[c] = float(allPrices[i]["sell_price"])
+
+    return coins_dict
+
+def huobipro(coins_dict,base):
+    for i in coins_dict:
+        if (i == base.upper()):
+            exchange_name =base.lower()+"usdt"
+        else:
+            exchange_name = i.lower()+base.lower()
+
+        ws = create_connection(huobipro_api)
+        tradeStr="""{"sub": "market."""+exchange_name+""".trade.detail","id": "id10"}"""
+        price = 0
+        for r in range(1,5):
+            ws.send(tradeStr)
+            compressData=ws.recv()
+            result=gzip.decompress(compressData).decode('utf-8')
+            datastore = json.loads(result)
+            try:
+                if price == 0:
+                    price = datastore["tick"]["data"][0]["price"]
+            except:
+                pass
+        coins_dict[i] = float(price)
 
     return coins_dict

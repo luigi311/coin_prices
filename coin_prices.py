@@ -113,7 +113,8 @@ try:
         function_map = {"coinmarketcap":coinmarketcap,
                         "bittrex":bittrex,
                         "poloniex":poloniex,
-                        "bithumb":bithumb}
+                        "bithumb":bithumb,
+                        "huobipro":huobipro}
 
         # Utilize the function_map to create the connection between the source
         # argument and the function can be called with just the variable
