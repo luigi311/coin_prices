@@ -40,7 +40,7 @@ def print_output(data):
         # Coinmarketcap printing must be handled differently due to all the
         # prices being in USD instead of base like all the exchanges
         if args.source == "coinmarketcap":
-            usd_prices = [data[i],'USD']
+            fiat_prices = [data[i],'USD']
 
             # Do not create the base price for base
             if i == base.upper():
@@ -52,7 +52,7 @@ def print_output(data):
                                base.upper()]
 
         elif args.source == "bithumb":
-            usd_prices = [data[i],'KRW']
+            fiat_prices = [data[i],'KRW']
 
             # Do not create the base price for base
             if i == base.upper():
@@ -70,12 +70,12 @@ def print_output(data):
             # Store the value of base in USD and do not create the print out
             # for base in base value
             if i == base.upper():
-                usd_prices = [data[i],"USD"]
+                fiat_prices = [data[i],"USD"]
                 base_prices = []
             else:
                 # Calculate USD price for coins by multiplying its base value
                 # by the current price of base
-                usd_prices = ["{:.4f}".format(data[i]*data[base.upper()]),'USD']
+                fiat_prices = ["{:.4f}".format(data[i]*data[base.upper()]),'USD']
                 base_prices = [format(data[i],'f'),base.upper()]
 
         # If the arguemnt for printing USD is used but not the argument for base
@@ -86,12 +86,12 @@ def print_output(data):
         # If the argument for printing base is used but not the argument for USD
         # then it will clear the USD values thus only prining the base prices
         if args.btc and args.usd == 0:
-            usd_prices = []
+            fiat_prices = []
 
         # Print out the coin name,usd and base values with a tab inbetween. The
         # asterik is there so it can print out the values as a string instead of
         # a list
-        print (i,"\t", *usd_prices, "\t", *base_prices)
+        print (i,"\t", *fiat_prices, "\t", *base_prices)
 
 try:
     while True:
