@@ -1,5 +1,4 @@
-import argparse
-import time, os
+import argparse, time, os
 from time import gmtime, strftime
 from collections import OrderedDict
 
@@ -42,6 +41,18 @@ def print_output(data):
         # prices being in USD instead of base like all the exchanges
         if args.source == "coinmarketcap":
             usd_prices = [data[i],'USD']
+
+            # Do not create the base price for base
+            if i == base.upper():
+                base_prices = []
+            else:
+                # Create base price for coins by dividing their usd price by
+                # the current value of base
+                base_prices = ["{:.10f}".format(data[i]/data[base.upper()],'f'),
+                               base.upper()]
+
+        elif args.source == "bithumb":
+            usd_prices = [data[i],'KRW']
 
             # Do not create the base price for base
             if i == base.upper():
@@ -101,7 +112,8 @@ try:
         # can be called when referenced by the source argument
         function_map = {"coinmarketcap":coinmarketcap,
                         "bittrex":bittrex,
-                        "poloniex":poloniex}
+                        "poloniex":poloniex,
+                        "bithumb":bithumb}
 
         # Utilize the function_map to create the connection between the source
         # argument and the function can be called with just the variable
@@ -109,7 +121,7 @@ try:
 
         # Grab the current prices for the coins that were specified and put them
         # into the coins_dict dictionary
-        coins_dict = coin_source(coins_dict)
+        coins_dict = coin_source(coins_dict,base)
 
         # Call the printing function that will decide which print scheme to use
         # based on the source

@@ -4,9 +4,10 @@ import urllib.request, json
 coinmarketcap_api = "https://api.coinmarketcap.com/v1/ticker/"
 bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
 poloniex_api = "https://poloniex.com/public?command=returnTicker"
+bithumb_api = "https://api.bithumb.com/public/ticker/all"
 
 # Function to grab the information from Coinmarketcap
-def coinmarketcap(coins_dict):
+def coinmarketcap(coins_dict,base):
     # Grab all the prices from coinmarketcap and puts it in a list
     with urllib.request.urlopen(coinmarketcap_api) as url:
         allPrices = json.loads(url.read().decode())
@@ -21,7 +22,7 @@ def coinmarketcap(coins_dict):
     return coins_dict
 
 # Function to grab the information from Bittrex
-def bittrex(coins_dict):
+def bittrex(coins_dict,base):
     # Grab the response from bittrex api which is a dictionary
     with urllib.request.urlopen(bittrex_api) as url:
         data = json.loads(url.read().decode())
@@ -45,7 +46,7 @@ def bittrex(coins_dict):
     return coins_dict
 
 # Function to grab the information from Poloniex
-def poloniex(coins_dict):
+def poloniex(coins_dict,base):
     # Grabs the response from poloniex api
     with urllib.request.urlopen(poloniex_api) as url:
         allPrices = json.loads(url.read().decode())
@@ -62,5 +63,18 @@ def poloniex(coins_dict):
             # selling
             if (i == base.upper()+"_"+c):
                 coins_dict[c] = float(allPrices[i]["lowestAsk"])
+
+    return coins_dict
+
+def bithumb(coins_dict,base):
+    with urllib.request.urlopen(bithumb_api) as url:
+        data = json.loads(url.read().decode())
+
+        allPrices = data["data"]
+
+    for i in allPrices:
+        for c in coins_dict:
+            if (i == c):
+                coins_dict[c] = float(allPrices[i]["sell_price"])
 
     return coins_dict
