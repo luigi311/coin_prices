@@ -71,9 +71,10 @@ def bithumb(coins_dict,base):
         data = json.loads(url.read().decode())
 
         allPrices = data["data"]
+
     for c in coins_dict:
         for i in allPrices:
             if (i == c):
                 coins_dict[c] = float(allPrices[i]["sell_price"])
 
-        return coins
+    return coins_dict
