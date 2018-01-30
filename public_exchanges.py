@@ -1,13 +1,13 @@
 import urllib.request, json, gzip, time
 from websocket import create_connection
 
-
 # Api list for the sources
 coinmarketcap_api = "https://api.coinmarketcap.com/v1/ticker/"
 bittrex_api = "https://bittrex.com/api/v1.1/public/getmarketsummaries"
 poloniex_api = "https://poloniex.com/public?command=returnTicker"
 bithumb_api = "https://api.bithumb.com/public/ticker/all"
 huobipro_api = "wss://api.huobipro.com/ws"
+
 # Function to grab the information from Coinmarketcap
 def coinmarketcap(coins_dict,base):
     # Grab all the prices from coinmarketcap and puts it in a list
@@ -87,26 +87,44 @@ def bithumb(coins_dict,base):
 
     return coins_dict
 
+# Function to grab the information from huobipro
 def huobipro(coins_dict,base):
     for i in coins_dict:
+        # Create exchange names that huobipro uses to grab coin prices
         if (i == base.upper()):
             exchange_name =base.lower()+"usdt"
         else:
             exchange_name = i.lower()+base.lower()
 
+        # Create socket information
         ws = create_connection(huobipro_api)
-        tradeStr="""{"sub": "market."""+exchange_name+""".trade.detail","id": "id10"}"""
+
+        # String to specify what infromation to retrieve from the webserver
+        tradeStr="""{"sub": "market."""+exchange_name+""".trade.detail","id":
+                 "id10"}"""
+
+        # Initialize price to 0
         price = 0
+
+        # The first couple of messages from the server are blank messages
         for r in range(1,5):
+            # Send the request to the webserver
             ws.send(tradeStr)
+            # Recieve the response from the webserver
             compressData=ws.recv()
+            # Decode the message to a json string
             result=gzip.decompress(compressData).decode('utf-8')
+
+            # Parse the json string to an acutal json
             datastore = json.loads(result)
             try:
-                if price == 0:
-                    price = datastore["tick"]["data"][0]["price"]
+                # Parse through the json and grab only the price value
+                coins_dict[i] = float(datastore["tick"]["data"][0]["price"])
+
+                # If the price value is grabbed break out of the for loop
+                break
             except:
+                # Skip this iteration if the returned value is blank
                 pass
-        coins_dict[i] = float(price)
 
     return coins_dict
