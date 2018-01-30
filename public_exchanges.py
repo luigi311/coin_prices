@@ -66,14 +66,20 @@ def poloniex(coins_dict,base):
 
     return coins_dict
 
+# Function to grab the information from bithumb
 def bithumb(coins_dict,base):
+    # Grabs the response from bithumb api
     with urllib.request.urlopen(bithumb_api) as url:
         data = json.loads(url.read().decode())
 
+        # Grab only the data key from the dictionary as that contains all the
+        # information
         allPrices = data["data"]
 
     for c in coins_dict:
         for i in allPrices:
+            # Grab the price for all the coins that exists and uses the
+            # sell_price as that is the lowest price someone is selling for
             if (i == c):
                 coins_dict[c] = float(allPrices[i]["sell_price"])
 
