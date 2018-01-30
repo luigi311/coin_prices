@@ -12,8 +12,8 @@ def coinmarketcap(coins_dict,base):
     with urllib.request.urlopen(coinmarketcap_api) as url:
         allPrices = json.loads(url.read().decode())
 
-    for i in allPrices:
-        for c in coins_dict:
+    for c in coins_dict:
+        for i in allPrices:
             if (i["symbol"] == c.upper()):
                 # Grab the USD price for the given coin and put it in the
                 # dictionary
@@ -31,8 +31,8 @@ def bittrex(coins_dict,base):
         # information
         allPrices = data["result"]
 
-    for i in allPrices:
-        for c in coins_dict:
+    for c in coins_dict:
+        for i in allPrices:
             # Grab the price for usdt-base pair which is the current price of
             # base in USD
             if (i["MarketName"] == 'USDT-'+base.upper()):
@@ -51,8 +51,8 @@ def poloniex(coins_dict,base):
     with urllib.request.urlopen(poloniex_api) as url:
         allPrices = json.loads(url.read().decode())
 
-    for i in allPrices:
-        for c in coins_dict:
+    for c in coins_dict:
+        for i in allPrices:
             # Grab the price for usdt-btc pair which is the current price of
             # base in USD
             if (i == 'USDT_'+base.upper()):
@@ -71,10 +71,9 @@ def bithumb(coins_dict,base):
         data = json.loads(url.read().decode())
 
         allPrices = data["data"]
-
-    for i in allPrices:
-        for c in coins_dict:
+    for c in coins_dict:
+        for i in allPrices:
             if (i == c):
                 coins_dict[c] = float(allPrices[i]["sell_price"])
 
-    return coins_dict
+        return coins
