@@ -38,3 +38,6 @@ Thumbs.db
 
 # Ignore python cache
 __pycache__
+
+# Ignore Coin List
+coin_list.txt
